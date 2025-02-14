@@ -1,12 +1,146 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- Viewport meta tag for mobile optimization -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Game Inventory</title>
+  <style>
+    /* Basic styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      margin-top: 0;
+    }
+    .filters {
+      margin-bottom: 20px;
+    }
+    .filters label {
+      margin-right: 10px;
+    }
+    .filters select {
+      margin-right: 10px;
+    }
+    .game {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    /* Simple responsiveness */
+    @media (max-width: 600px) {
+      .filters {
+        display: flex;
+        flex-direction: column;
+      }
+      .filters label, .filters select, #filterBtn {
+        margin-bottom: 10px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Welcome to the Game Inventory</h1>
-  <!-- We will add more code here later -->
+  <h1>Game Inventory</h1>
+
+  <!-- Filter Section -->
+  <div class="filters">
+    <label for="ageFilter">Age:</label>
+    <select id="ageFilter">
+      <option value="">All</option>
+      <option value="8+">8+</option>
+      <option value="10+">10+</option>
+      <option value="12+">12+</option>
+    </select>
+
+    <label for="playTimeFilter">Play Time:</label>
+    <select id="playTimeFilter">
+      <option value="">All</option>
+      <option value="Short">Short</option>
+      <option value="Medium">Medium</option>
+      <option value="Long">Long</option>
+    </select>
+
+    <label for="gameTypeFilter">Game Type:</label>
+    <select id="gameTypeFilter">
+      <option value="">All</option>
+      <option value="Strategy">Strategy</option>
+      <option value="Family">Family</option>
+      <option value="Cooperative">Cooperative</option>
+      <option value="Party">Party</option>
+      <!-- Add more options as needed -->
+    </select>
+
+    <label for="locationFilter">Location:</label>
+    <select id="locationFilter">
+      <option value="">All</option>
+      <option value="Shelf A">Shelf A</option>
+      <option value="Shelf B">Shelf B</option>
+      <option value="Shelf C">Shelf C</option>
+      <option value="Shelf D">Shelf D</option>
+      <!-- Add more as needed -->
+    </select>
+
+    <button id="filterBtn">Filter</button>
+  </div>
+
+  <!-- Results Section -->
+  <div id="results"></div>
+
+  <script>
+    let gamesData = [];
+
+    // Fetch the JSON data from games.json
+    fetch('games.json')
+      .then(response => response.json())
+      .then(data => {
+        gamesData = data;
+        // Display all games on initial load
+        displayGames(gamesData);
+      })
+      .catch(error => console.error('Error fetching games.json:', error));
+
+    // Function to display a list of games
+    function displayGames(games) {
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+
+      games.forEach(game => {
+        const gameDiv = document.createElement('div');
+        gameDiv.classList.add('game');
+        gameDiv.innerHTML = `
+          <h2>${game.name}</h2>
+          <p><strong>Age:</strong> ${game.age}</p>
+          <p><strong>Play Time:</strong> ${game.playTime}</p>
+          <p><strong>Type:</strong> ${game.gameType}</p>
+          <p><strong>Location:</strong> ${game.location}</p>
+        `;
+        resultsDiv.appendChild(gameDiv);
+      });
+    }
+
+    // Filter button click event
+    document.getElementById('filterBtn').addEventListener('click', () => {
+      const ageValue = document.getElementById('ageFilter').value;
+      const playTimeValue = document.getElementById('playTimeFilter').value;
+      const gameTypeValue = document.getElementById('gameTypeFilter').value;
+      const locationValue = document.getElementById('locationFilter').value;
+
+      // Filter the data
+      const filteredGames = gamesData.filter(game => {
+        // If a filter is selected, check the value; if it doesn't match, exclude the game
+        if (ageValue && game.age !== ageValue) return false;
+        if (playTimeValue && game.playTime !== playTimeValue) return false;
+        if (gameTypeValue && game.gameType !== gameTypeValue) return false;
+        if (locationValue && game.location !== locationValue) return false;
+
+        return true; // If all filters pass, include the game
+      });
+
+      // Display filtered results
+      displayGames(filteredGames);
+    });
+  </script>
 </body>
 </html>
